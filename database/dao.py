@@ -3,20 +3,13 @@ from model.team import Team
 
 class DAO:
     @staticmethod
-    def get_all_years():
+    def anni_dd():
         conn = DBConnect.get_connection()
-
         result = []
-
         cursor = conn.cursor(dictionary=True)
-        query = """ select distinct year 
-                    from team 
-                    where year >= 1980
-                    order by year
-                    """
-
+        query = """ select distinct year from team t 
+                    where t.year >=1980 """
         cursor.execute(query)
-
         for row in cursor:
             result.append(row["year"])
 
@@ -24,24 +17,16 @@ class DAO:
         conn.close()
         return result
 
-    @ staticmethod
+    @staticmethod
     def get_teams_by_year(year):
         conn = DBConnect.get_connection()
-
         result = []
-
         cursor = conn.cursor(dictionary=True)
-        query = """select id, team_code, name
-                    from team 
-                    where year = %s
-                    order by team_code                              
-                """
-
+        query = """ select id,team_code,name from team t 
+                            where t.year = %s """
         cursor.execute(query,(year,))
-
         for row in cursor:
-            team = Team(row["id"], row["team_code"], row["name"])
-            result.append(team)
+            result.append(Team(**row))
 
         cursor.close()
         conn.close()
@@ -50,22 +35,14 @@ class DAO:
     @staticmethod
     def get_team_salary(year):
         conn = DBConnect.get_connection()
-
-        result = {}
-
         cursor = conn.cursor(dictionary=True)
-        query = """ select  team_id, sum(salary) as tot_salary
-                    from salary
+        query = """ select team_id,sum(salary) as total
+                    from salary s
                     where year = %s
-                    group by team_id
-                """
-
-        cursor.execute(query,(year,))
-
-        for row in cursor:
-            result[row["team_id"]] = row["tot_salary"]
+                    group by team_id """
+        cursor.execute(query, (year,))
+        result = {row["team_id"]: row["total"] for row in cursor}
 
         cursor.close()
         conn.close()
         return result
-

@@ -2,15 +2,13 @@ from dataclasses import dataclass
 
 @dataclass
 class Team:
-    id: int
-    team_code: str
-    name: str
+    id : int
+    team_code : str
+    name : str
 
     def __str__(self):
         return f"{self.team_code} ({self.name})"
-
     def __repr__(self):
         return f"{self.team_code} ({self.name})"
-
-    def __hash__(self):
+    def __hash__(self): # deve restituire un numero intero
         return hash(self.id)
